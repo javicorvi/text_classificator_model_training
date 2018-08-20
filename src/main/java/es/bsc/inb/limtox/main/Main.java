@@ -12,6 +12,7 @@ class Main {
         ctx.register(AppConfig.class);
         ctx.refresh();
         ClassifierService mainService = (ClassifierService)ctx.getBean("classifierServiceImpl");
-        mainService.trainAndTestClassifier();
+        String properties_parameters_path = args[0];
+        mainService.trainAndTestClassifier(properties_parameters_path);
     }      
 }

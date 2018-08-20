@@ -64,11 +64,6 @@
 		    <artifactId>spring-tx</artifactId>
 		    <version>4.3.8.RELEASE</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 		    <groupId>log4j</groupId> -->
-<!-- 		    <artifactId>log4j</artifactId> -->
-<!-- 		    <version>1.2.17</version> -->
-<!-- 		</dependency> -->
 		<dependency>
     	<groupId>org.codehaus.jackson</groupId>
     		<artifactId>jackson-mapper-asl</artifactId>
@@ -89,21 +84,12 @@
 		    <artifactId>log4j</artifactId>
 		    <version>1.2.17</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 		    <groupId>com.chemspot</groupId> -->
-<!-- 		    <artifactId>chemspot</artifactId> -->
-<!-- 		    <version>2.0</version> -->
-<!-- no va 		    <scope>system</scope> --> 
-<!-- no va		    <systemPath>${project.basedir}/lib/chemspot2.0.jar</systemPath> --> 
-<!-- 		</dependency> -->
 		<dependency>
 		    <groupId>org.apache.maven.plugins</groupId>
 		    <artifactId>maven-assembly-plugin</artifactId>
 		    <version>3.1.0</version>
 		</dependency>
 	</dependencies>
-	
-	
 	<build>
 		<plugins>
 			<plugin>
@@ -128,8 +114,7 @@
 			    </execution>
 			  </executions>
 			</plugin>
-		
-		  	<plugin>
+			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-assembly-plugin</artifactId>
 			    <executions>

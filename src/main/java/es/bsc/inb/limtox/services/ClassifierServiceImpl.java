@@ -2,8 +2,10 @@ package es.bsc.inb.limtox.services;
 
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Properties;
@@ -15,7 +17,6 @@ import edu.stanford.nlp.classify.Classifier;
 import edu.stanford.nlp.classify.ColumnDataClassifier;
 import edu.stanford.nlp.classify.GeneralDataset;
 import edu.stanford.nlp.classify.LinearClassifier;
-
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.util.Pair;
 @Service
@@ -51,7 +52,18 @@ class ClassifierServiceImpl implements ClassifierService {
 		    // build the classifier and print the features again but will all the train dataset
 		    Classifier<String,String> cl = cdc.makeClassifier(train);
 		    printClassifier(cl, propertiesParameters.getProperty("printClassifier"), new Integer(propertiesParameters.getProperty("printClassifierParam")), propertiesParameters.getProperty("printTo"),null);
-		    cdc.serializeClassifier(propertiesParameters.getProperty("serializeTo"));
+		    
+		    //cdc.serializeClassifier(propertiesParameters.getProperty("serializeTo")+".gz");
+		    
+		    /*FileOutputStream fout2 = new FileOutputStream(propertiesParameters.getProperty("serializeTo")+".ser2");
+		    ObjectOutputStream oos2 = new ObjectOutputStream(fout2);
+		    oos2.writeObject(cl);
+		    oos2.close();*/
+		    
+		    FileOutputStream fout = new FileOutputStream(propertiesParameters.getProperty("serializeTo"));
+		    ObjectOutputStream oos = new ObjectOutputStream(fout);
+		    oos.writeObject(cl);
+		    oos.close();
 		    
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

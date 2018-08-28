@@ -24,15 +24,12 @@ class ClassifierServiceImpl implements ClassifierService {
 
 	static final Logger classifierLog = Logger.getLogger("classifierLog");
 	
-	public void trainAndTestClassifier(String properitesParametersPath) {
+	public void crossValidation(String properitesParametersPath) {
 		try {
-			
 			classifierLog.info("Training model with properties :  " +  properitesParametersPath);
 			Properties propertiesParameters = this.loadPropertiesParameters(properitesParametersPath);
 			classifierLog.info("The data set for training : " + propertiesParameters.getProperty("trainFile"));
 			classifierLog.info("Cross Validation with k-folds : " + propertiesParameters.getProperty("crossValidationFolds"));
-			classifierLog.info("The model will be stored in : " + propertiesParameters.getProperty("serializeTo"));
-			classifierLog.info("The top : " + propertiesParameters.getProperty("printClassifierParam") + " features will be stored in : " +  propertiesParameters.getProperty("printTo"));
 			
 			ColumnDataClassifier cdc = new ColumnDataClassifier(properitesParametersPath);
 			//tiene que sacarlo del archivo de properties o sino pasarlo tb como parametro ...
@@ -49,22 +46,37 @@ class ClassifierServiceImpl implements ClassifierService {
 			classifierLog.info("Average accuracy/micro-averaged F1: " + results.first);
 		    classifierLog.info("Average macro-averaged F1: " + results.second);
 			
-		    // build the classifier and print the features again but will all the train dataset
-		    Classifier<String,String> cl = cdc.makeClassifier(train);
-		    printClassifier(cl, propertiesParameters.getProperty("printClassifier"), new Integer(propertiesParameters.getProperty("printClassifierParam")), propertiesParameters.getProperty("printTo"),null);
-		    
 		    //cdc.serializeClassifier(propertiesParameters.getProperty("serializeTo")+".gz");
 		    
 		    /*FileOutputStream fout2 = new FileOutputStream(propertiesParameters.getProperty("serializeTo")+".ser2");
 		    ObjectOutputStream oos2 = new ObjectOutputStream(fout2);
 		    oos2.writeObject(cl);
 		    oos2.close();*/
-		    
+		    /*
 		    FileOutputStream fout = new FileOutputStream(propertiesParameters.getProperty("serializeTo"));
 		    ObjectOutputStream oos = new ObjectOutputStream(fout);
 		    oos.writeObject(cl);
-		    oos.close();
+		    oos.close();*/
 		    
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void generateClassificator(String properitesParametersPath) {
+		try {
+			Properties propertiesParameters = this.loadPropertiesParameters(properitesParametersPath);
+			classifierLog.info("After cross validation results the model is generate with all the training dataset");
+			classifierLog.info("The model will be stored in : " + propertiesParameters.getProperty("serializeTo"));
+			classifierLog.info("The top : " + propertiesParameters.getProperty("printClassifierParam") + " features will be stored in : " +  propertiesParameters.getProperty("printTo"));
+			ColumnDataClassifier cdc = new ColumnDataClassifier(properitesParametersPath);
+			propertiesParameters.setProperty("crossValidationFolds", "0");
+			cdc.trainClassifier(propertiesParameters.getProperty("trainFile"));			
+			classifierLog.info("The model was generated.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -73,30 +85,6 @@ class ClassifierServiceImpl implements ClassifierService {
 			e.printStackTrace();
 		}
 	}
-	
-	 private void printClassifier(Classifier classifier, String printClassifier, int printClassifierParam, String printTo, String enconding ) {
-		    String classString;
-		    if (classifier instanceof LinearClassifier<?,?>) {
-		      classString = ((LinearClassifier<?,?>)classifier).toString(printClassifier, printClassifierParam);
-		    } else {
-		      classString = classifier.toString();
-		    }
-		    if (printTo != null) {
-		      PrintWriter fw = null;
-		      try {
-		        fw = IOUtils.getPrintWriter(printTo, enconding);
-		        fw.write(classString);
-		        fw.println();
-		      } catch (IOException ioe) {
-		    	  classifierLog.warn(ioe);
-		      } finally {
-		        IOUtils.closeIgnoringExceptions(fw);
-		      }
-		      classifierLog.info("Built classifier described in file " + printTo);
-		    } else {
-		    classifierLog.info("Built this classifier: " + classString);
-		    }
-		  }
 
 	 
 	 /**

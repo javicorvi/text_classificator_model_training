@@ -1,23 +1,21 @@
 package es.bsc.inb.limtox.services;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import edu.stanford.nlp.classify.Classifier;
 import edu.stanford.nlp.classify.ColumnDataClassifier;
 import edu.stanford.nlp.classify.GeneralDataset;
-import edu.stanford.nlp.classify.LinearClassifier;
-import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.util.Pair;
 @Service
 class ClassifierServiceImpl implements ClassifierService {
@@ -86,6 +84,34 @@ class ClassifierServiceImpl implements ClassifierService {
 		}
 	}
 
+	/**
+	 * Un ultimo test con otro data set distinto al del cross validation
+	 */
+	public void testClassificator(String properitesParametersPath) {
+		try {
+			Properties propertiesParameters = this.loadPropertiesParameters(properitesParametersPath);
+			classifierLog.info("A test with a diferent dataset of the cross validation and training model to generate de classifier");
+			classifierLog.info("The model is : " + propertiesParameters.getProperty("serializeTo"));
+			classifierLog.info("The test data set is  : " + propertiesParameters.getProperty("testFile"));
+			
+			//Levantar ColumnDataClassifier
+			ByteArrayInputStream bais = new ByteArrayInputStream(FileUtils.readFileToByteArray(new File(propertiesParameters.getProperty("serializeTo"))));
+		    ObjectInputStream ois = new ObjectInputStream(bais);
+		    ColumnDataClassifier cdc = ColumnDataClassifier.getClassifier(ois);
+		    ois.close();
+			
+			Pair<Double, Double> performance = cdc.testClassifier(propertiesParameters.getProperty("testFile"));
+			System.out.printf("Accuracy: %.3f; macro-F1: %.3f%n", performance.first(), performance.second());		
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	 
 	 /**
 	  * Load Properties

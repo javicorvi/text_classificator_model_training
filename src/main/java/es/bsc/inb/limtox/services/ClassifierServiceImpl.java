@@ -1,12 +1,16 @@
 package es.bsc.inb.limtox.services;
 
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Properties;
 
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import edu.stanford.nlp.classify.ColumnDataClassifier;
 import edu.stanford.nlp.classify.GeneralDataset;
+import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.Pair;
 @Service
 class ClassifierServiceImpl implements ClassifierService {
@@ -59,6 +64,37 @@ class ClassifierServiceImpl implements ClassifierService {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public void generateMulticlassEntityMentionTokens(String properitesParametersPath) {
+		Properties propertiesParameters = this.loadPropertiesParameters(properitesParametersPath);
+		classifierLog.info("The top entity mentions will contain the words from the features : " +  propertiesParameters.getProperty("printTo"));
+		classifierLog.info("Entity Mentions Rules output : " +  propertiesParameters.getProperty("entityMentionsTokensRules"));
+		FileOutputStream fos;
+		File inputDirectory = new File(propertiesParameters.getProperty("printTo"));
+		try { 
+			fos = new FileOutputStream(propertiesParameters.getProperty("entityMentionsTokensRules"));
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+			for (String line : ObjectBank.getLineIterator(inputDirectory.getAbsolutePath(), "utf-8")) {
+				//word
+				if(line.contains("-SW#-")) {
+					int i = line.lastIndexOf("-SW#-");
+					String t = line.substring(i+5);
+					i = t.lastIndexOf(")");
+					t = t.substring(0, i);
+					String[] data = t.split(",");
+					bw.write(data[0]+"\t" + data[1] + "\n");		
+					bw.flush();
+				}
+			}
+			bw.close();
+			fos.close();
+		} catch (FileNotFoundException e) {
+				classifierLog.error(" File not Found " + inputDirectory.getAbsolutePath(), e);
+				
+		} catch (IOException e) {
+				classifierLog.error(" IOException " + inputDirectory.getAbsolutePath(), e);
 		}
 	}
 	

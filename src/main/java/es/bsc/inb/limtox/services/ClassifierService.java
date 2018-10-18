@@ -7,4 +7,6 @@ public interface ClassifierService {
 	public void generateClassificator(String properties_parameters_path);
 	
 	public void testClassificator(String properties_parameters_path);
+
+	public void generateMulticlassEntityMentionTokens(String properties_parameters_path);
 }
